@@ -89,15 +89,71 @@
       border: 1.5px solid #4E8CFF;
       box-shadow: 0 2px 8px #4e8cff22;
     }
+    /* 响应式布局增强 */
+    @media (max-width: 900px) {
+      body {
+        margin: 1rem;
+      }
+      h2 {
+        font-size: 1.3rem;
+      }
+      button {
+        font-size: 1rem;
+        padding: .6rem 1.1rem;
+      }
+      textarea {
+        font-size: .98rem;
+        height: 50vh;
+        padding: .8rem;
+      }
+    }
     @media (max-width: 600px) {
+      body {
+        margin: .5rem;
+      }
+      h2 {
+        font-size: 1.1rem;
+        margin-bottom: .7rem;
+      }
       .location-group {
-        font-size: .95rem;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-start;
         gap: .3rem;
+        font-size: .95rem;
       }
       .location-group .loc-btn {
+        width: calc(33.33% - .3rem);
+        min-width: 0;
+        max-width: 100%;
+        font-size: .98rem;
+        padding: .4rem 0;
+        margin-bottom: .2rem;
+        box-sizing: border-box;
+      }
+      button {
+        width: 100%;
+        font-size: 1rem;
+        padding: .7rem 0;
+        margin-bottom: .7rem;
+      }
+      textarea {
+        font-size: .97rem;
+        height: 35vh;
+        padding: .7rem;
+      }
+    }
+    @media (max-width: 400px) {
+      h2 {
         font-size: .95rem;
-        padding: .35rem .7rem;
-        min-width: 70px;
+      }
+      button, .location-group .loc-btn {
+        font-size: .9rem;
+        padding: .3rem 0;
+      }
+      textarea {
+        font-size: .93rem;
+        height: 25vh;
       }
     }
   </style>
