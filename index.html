@@ -365,8 +365,13 @@
         `｜今年第 ${now.dayOfYear()} 天｜🥰恋爱第${loveDays}天💕${locNotice}`;
       const weatherLine = weather.join("｜");
       // 5.1 获取新闻
-      const newsList = await fetchNews();
-      const newsLine = newsList.length ? `**今日新闻：**\n` + newsList.map(n => `- ${n}`).join("\n") : "**今日新闻：** 暂无";
+      const [newsList, nhkList] = await Promise.all([
+        fetchNews(),
+        fetchNHKNews()
+      ]);
+      let newsBlock = `##### 今日新闻 📰\n`;
+      newsBlock += `**Google News**\n` + (newsList.length ? newsList.map(n => `- ${n}`).join("\n") : "- 暂无") + "\n\n";
+      newsBlock += `**NHK**\n` + (nhkList.length ? nhkList.map(n => `- ${n}`).join("\n") : "- 暂无");
 
       const md = `${title}
 
@@ -374,7 +379,7 @@
 ${dateLine}\n${weatherLine}
 
 ---
-${newsLine}
+${newsBlock}
 
 ---
 
@@ -445,6 +450,42 @@ ${newsLine}
           if (news.length) return news;
         } catch (e) {
           // 继续尝试下一个代理
+        }
+      }
+      return [];
+    }
+
+    /**
+     * 获取NHK新闻（优先官方RSS，失败兜底RSSHub）
+     * @returns {Promise<string[]>}
+     */
+    async function fetchNHKNews() {
+      const feeds = [
+        "https://www3.nhk.or.jp/rss/news/cat0.xml",
+        "https://rsshub.app/nhk/news"
+      ];
+      const proxies = [
+        url => "https://api.allorigins.win/raw?url=" + encodeURIComponent(url),
+        url => "https://corsproxy.io/?" + encodeURIComponent(url),
+        url => "https://thingproxy.freeboard.io/fetch/" + url
+      ];
+      for (const feed of feeds) {
+        for (const proxy of proxies) {
+          try {
+            const res = await fetch(proxy(feed));
+            const text = await res.text();
+            const xml = new window.DOMParser().parseFromString(text, "text/xml");
+            const items = xml.querySelectorAll("item");
+            let news = [];
+            for (let i = 0; i < Math.min(3, items.length); i++) {
+              const title = items[i].querySelector("title").textContent;
+              const link = items[i].querySelector("link").textContent;
+              news.push(`[${title}](${link})`);
+            }
+            if (news.length) return news;
+          } catch (e) {
+            // 继续尝试下一个代理
+          }
         }
       }
       return [];
